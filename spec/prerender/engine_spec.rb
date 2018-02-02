@@ -34,6 +34,18 @@ RSpec.describe do
     engine.changed(category)
   end
 
+  it "deduplicates views" do
+    category = double(:category, id: 1, name: "Tech")
+    post = double(:post, id: 2, content: "other content", categories: [
+      category,
+    ])
+    expect(file_system).to receive(:[]=).
+      with("category-1.html", "<html>Tech</html>").once
+    allow(file_system).to receive(:[]=).
+      with("post-2.html", "<html>other content</html>")
+    engine.batch_changed([category, post])
+  end
+
   class TestViewEnumerator
     def views_for_model(model)
       if model.respond_to? :content
@@ -57,6 +69,10 @@ RSpec.describe do
     def render
       "<html>#{@post.content}</html>"
     end
+
+    def key
+      [:post, @post.id]
+    end
   end
 
   class TestCategoryView
@@ -70,6 +86,10 @@ RSpec.describe do
 
     def render
       "<html>#{@category.name}</html>"
+    end
+
+    def key
+      [:category, @category.id]
     end
   end
 end

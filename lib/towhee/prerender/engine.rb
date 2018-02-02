@@ -8,13 +8,16 @@ module Towhee::Prerender
     end
 
     def changed(model)
-      views = views_for_model(model)
+      batch_changed([model])
+    end
+
+    def batch_changed(models)
+      views = models.flat_map { |model| views_for_model(model) }
+      views = views.uniq(&:key)
       views.each do |view|
         render(view)
       end
     end
-
-    private
 
     def views_for_model(model)
       @view_enumerator.views_for_model(model)
