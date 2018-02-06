@@ -1,5 +1,6 @@
 require 'towhee/prerender/engine'
 require 'towhee/blog/view_enumerator'
+require 'towhee/blog/site'
 
 module Towhee::Blog
   class App
@@ -8,7 +9,8 @@ module Towhee::Blog
         fs: fs,
         view_enumerator: ViewEnumerator.new,
       )
-      engine.changed(nil)
+      site = Site.new
+      engine.changed(site)
     end
   end
 end
