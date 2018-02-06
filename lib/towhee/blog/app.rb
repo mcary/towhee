@@ -1,16 +1,15 @@
 require 'towhee/prerender/engine'
 require 'towhee/blog/view_enumerator'
-require 'towhee/blog/site'
 
 module Towhee::Blog
   class App
-    def initialize(fs)
+    def initialize(fs:, repo:)
       @fs = fs
+      @repo = repo
     end
 
     def prerender
-      site = Site.new
-      engine.changed(site)
+      engine.batch_changed(@repo.all_sites)
     end
 
     private
