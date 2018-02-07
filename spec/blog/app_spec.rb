@@ -4,7 +4,9 @@ require 'towhee/blog/site'
 
 RSpec.describe "Blog prerendering" do
   subject do
-    repo = double(:repo, all_sites: [Towhee::Blog::Site.new(name: "Foo")])
+    repo = Towhee::Blog::Repository.new(
+      sites: [Towhee::Blog::Site.new(name: "Foo")],
+    )
     Towhee::Blog::App.new(fs: file_system, repo: repo)
   end
 
