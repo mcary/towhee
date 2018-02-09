@@ -1,28 +1,20 @@
 require 'cgi'
 require 'towhee/html'
 require 'towhee/html/fragment'
+require 'towhee/html/tag_definer'
 
 module Towhee::HTML
   class Writer
+    extend TagDefiner
+
     def initialize
       @indent = 0
     end
 
-    def span(*args)
-      inline_tag("span", *args) { yield }
-    end
-
-    def div(*args)
-      block_tag("div", *args) { yield }
-    end
-
-    def p(*args)
-      block_tag("p", *args) { yield }
-    end
-
-    def a(*args)
-      inline_tag("a", *args) { yield }
-    end
+    define_inline_tag :span
+    define_block_tag :div
+    define_block_tag :p
+    define_inline_tag :a
 
     def br
       follow_with_newline(empty_tag("br"))
