@@ -95,4 +95,20 @@ RSpec.describe Towhee::HTML::Writer do
       "no implicit conversion of Towhee::HTML::Fragment into String",
     )
   end
+
+  it "runs fast" do
+    long_str = "asdfasdf " * 12 # Enough to allocate on the heap
+    result = benchmark "writer spec" do
+      subject.div class: "container" do
+        10.times.map do
+          subject.p {
+            subject.a(href: "http://example.com/") { "Example Link" } +
+              subject.text(long_str)
+          }
+        end.inject(subject.text(""), &:+)
+      end
+    end
+    lines = result.to_s.split("\n")
+    expect(lines.grep(/>Example Link</).count).to eq 10
+  end
 end

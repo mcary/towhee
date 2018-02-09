@@ -2,7 +2,8 @@ module BenchmarkSupport
   def benchmark(descr)
     @benchmark_git_sha ||= `git describe --always --dirty=-dirty`.chomp
     require 'benchmark'
-    tms = Benchmark.measure { yield }
+    result = nil
+    tms = Benchmark.measure { result = yield }
     # Extract helper for project_root?
     project_root = File.dirname(File.dirname(File.dirname(__FILE__)))
     file = caller.first.split(":", 2).first.sub(project_root, ".")
@@ -27,6 +28,7 @@ module BenchmarkSupport
     File.open("benchmarks.csv", "a") do |f|
       f.write(msg)
     end
+    result
   end
 
   def fmt_time(delta)
