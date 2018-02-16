@@ -1,9 +1,9 @@
 require 'towhee/prerender/engine'
 
-RSpec.describe "Prerender Engine" do
+RSpec.describe Towhee::Prerender::Engine do
   let(:file_system) { double(:file_system) }
   let(:engine) do
-    Towhee::Prerender::Engine.new(
+    described_class.new(
       fs: file_system,
       view_enumerator: TestViewEnumerator.new,
     )

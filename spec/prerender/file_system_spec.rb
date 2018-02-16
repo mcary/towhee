@@ -3,7 +3,7 @@ require 'fileutils'
 
 RSpec.describe Towhee::Prerender::FileSystem do
   subject do
-    Towhee::Prerender::FileSystem.new(fs_root)
+    described_class.new(fs_root)
   end
 
   let :fs_root do

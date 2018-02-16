@@ -1,7 +1,7 @@
 require 'towhee/blog/repository'
 require 'towhee/blog/site'
 
-RSpec.describe "Blog repository" do
+RSpec.describe Towhee::Blog::Repository do
   context "no sites" do
     it "returns none" do
       repo = repository(sites: [])
@@ -18,6 +18,6 @@ RSpec.describe "Blog repository" do
   end
 
   def repository(*args)
-    Towhee::Blog::Repository.new(*args)
+    described_class.new(*args)
   end
 end

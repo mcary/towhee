@@ -1,7 +1,7 @@
 require 'towhee/html/fragment'
 
-RSpec.describe "Towhee::HTML::Fragment" do
-  let(:klass) { Towhee::HTML::Fragment }
+RSpec.describe Towhee::HTML::Fragment do
+  let(:klass) { described_class }
 
   it "converts to string" do
     expect(klass.new("foo").to_s).to eq "foo"
