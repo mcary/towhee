@@ -46,6 +46,12 @@ RSpec.describe Towhee::HTML::Writer do
     expect(result.to_s).to eq "<script src=\"foo.js\"></script>\n"
   end
 
+  it "writes style with unescaped content" do
+    result = subject.style { "h1 { font-family: \"Arial\" }" }
+    expect(result.to_s).to eq \
+      "<style>\n  h1 { font-family: \"Arial\" }\n</style>"
+  end
+
   it "nests block-in-block" do
     result = subject.div { subject.p { "hello" } }
     expect(result.to_s).to eq "<div>\n  <p>\n    hello\n  </p>\n</div>"

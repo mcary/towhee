@@ -32,6 +32,14 @@ module Towhee::HTML
       end
     end
 
+    def style(*args)
+      block_tag("style", *args) do
+        # CSS won't parse if we escape it.  It has to be trusted.
+        trust yield
+      end
+    end
+
+
     def text(str)
       escape(str)
     end
