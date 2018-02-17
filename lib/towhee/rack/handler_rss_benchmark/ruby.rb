@@ -1,0 +1,2 @@
+require './rss'
+p rss
