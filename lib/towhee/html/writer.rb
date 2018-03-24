@@ -14,10 +14,23 @@ module Towhee::HTML
     define_inline_tag :span
     define_block_tag :div
     define_block_tag :p
+    define_block_tag :html
+    define_block_tag :head
+    define_block_tag :body
+    define_block_tag :ul
+    define_block_tag :li
     define_inline_tag :a
 
     def br
       follow_with_newline(empty_tag("br"))
+    end
+
+    def title(*args)
+      follow_with_newline(inline_tag("title", *args) { yield })
+    end
+
+    def link(*args)
+      follow_with_newline(empty_tag("link", *args))
     end
 
     def script(*args)
@@ -47,18 +60,25 @@ module Towhee::HTML
     private
 
     def block_tag(tag_name, attributes={})
-      child_content =
-        "#{increasing_indent { trust(prefix) + escape(yield) } }\n#{prefix}"
+      child_content = increasing_indent do
+        child_content = yield
+        child_content = if false || child_content
+          "\n#{prefix}#{escape(child_content)}"
+        end
+        child_content = child_content.to_s
+      end
+      suffix = "\n#{prefix}"
+      child_content += suffix unless child_content.end_with?(suffix)
       open_tag = "<#{tag_name}#{attr_str(attributes)}>"
-      trust "#{open_tag}\n#{child_content}</#{tag_name}>"
+      trust "#{open_tag}#{child_content}</#{tag_name}>\n#{prefix}"
     end
 
     def inline_tag(tag_name, attributes={})
       trust "<#{tag_name}#{attr_str(attributes)}>#{escape yield}</#{tag_name}>"
     end
 
-    def empty_tag(tag_name)
-      trust "<#{tag_name} />"
+    def empty_tag(tag_name, attributes={})
+      trust "<#{tag_name}#{attr_str(attributes)} />"
     end
 
     def follow_with_newline(obj)

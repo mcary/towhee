@@ -36,6 +36,34 @@ RSpec.describe Towhee::HTML::Writer do
     expect(result.to_s).to eq "<br />\n"
   end
 
+  it "writes ul with li" do
+    result = subject.ul { subject.li { "hi" } }
+    expect(result.to_s).to eq "<ul>\n  <li>\n    hi\n  </li>\n  \n</ul>\n"
+  end
+
+  it "writes html, head, and body" do
+    result = subject.html { subject.head {} + subject.body {} }
+    expect(result.to_s).to eq "
+      <html>
+        <head>
+        </head>
+        <body>
+        </body>
+        
+      </html>
+    ".gsub("\n" + " "*6, "\n").strip + "\n"
+  end
+
+  it "writes title" do
+    result = subject.title { "Site » Page" }
+    expect(result.to_s).to eq "<title>Site » Page</title>\n"
+  end
+
+  it "writes link" do
+    result = subject.link(href: "style.css", rel: "stylesheet")
+    expect(result.to_s).to eq "<link href=\"style.css\" rel=\"stylesheet\" />\n"
+  end
+
   it "writes script with unescaped content" do
     result = subject.script { "alert('hello');" }
     expect(result.to_s).to eq "<script>\n  alert('hello');\n</script>\n"
