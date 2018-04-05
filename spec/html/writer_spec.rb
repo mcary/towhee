@@ -1,7 +1,7 @@
 require 'towhee/html/writer'
 
 RSpec.describe Towhee::HTML::Writer do
-  it "writes spans" do
+  it "writes spans without indentation" do
     result = subject.span { "hello" }
     expect(result.to_s).to eq "<span>hello</span>"
   end
@@ -11,19 +11,19 @@ RSpec.describe Towhee::HTML::Writer do
     expect(result.to_s).to eq "<span class=\"foo\">hello</span>"
   end
 
-  it "writes divs" do
+  it "writes divs with indentation" do
     result = subject.div { "hello" }
-    expect(result.to_s).to eq "<div>\n  hello\n</div>"
+    expect(result.to_s).to eq "<div>\n  hello\n</div>\n"
   end
 
   it "writes divs with class" do
     result = subject.div(class: "foo") { "hello" }
-    expect(result.to_s).to eq "<div class=\"foo\">\n  hello\n</div>"
+    expect(result.to_s).to eq "<div class=\"foo\">\n  hello\n</div>\n"
   end
 
   it "writes paragraphs" do
     result = subject.p { "hello" }
-    expect(result.to_s).to eq "<p>\n  hello\n</p>"
+    expect(result.to_s).to eq "<p>\n  hello\n</p>\n"
   end
 
   it "writes links" do
@@ -38,7 +38,7 @@ RSpec.describe Towhee::HTML::Writer do
 
   it "writes script with unescaped content" do
     result = subject.script { "alert('hello');" }
-    expect(result.to_s).to eq "<script>\n  alert('hello');\n</script>"
+    expect(result.to_s).to eq "<script>\n  alert('hello');\n</script>\n"
   end
 
   it "writes empty script as inline with newline" do
@@ -49,27 +49,27 @@ RSpec.describe Towhee::HTML::Writer do
   it "writes style with unescaped content" do
     result = subject.style { "h1 { font-family: \"Arial\" }" }
     expect(result.to_s).to eq \
-      "<style>\n  h1 { font-family: \"Arial\" }\n</style>"
+      "<style>\n  h1 { font-family: \"Arial\" }\n</style>\n"
   end
 
   it "nests block-in-block" do
     result = subject.div { subject.p { "hello" } }
-    expect(result.to_s).to eq "<div>\n  <p>\n    hello\n  </p>\n</div>"
+    expect(result.to_s).to eq "<div>\n  <p>\n    hello\n  </p>\n  \n</div>\n"
   end
 
   it "nests inline-in-block" do
     result = subject.div { subject.span { "hello" } }
-    expect(result.to_s).to eq "<div>\n  <span>hello</span>\n</div>"
+    expect(result.to_s).to eq "<div>\n  <span>hello</span>\n</div>\n"
   end
 
   it "nests empty-in-block" do
     result = subject.div { subject.br }
-    expect(result.to_s).to eq "<div>\n  <br />\n  \n</div>"
+    expect(result.to_s).to eq "<div>\n  <br />\n  \n</div>\n"
   end
 
   it "div escapes child content" do
     result = subject.div { "<script>" }
-    expect(result.to_s).to eq "<div>\n  &lt;script&gt;\n</div>"
+    expect(result.to_s).to eq "<div>\n  &lt;script&gt;\n</div>\n"
   end
 
   it "span escapes child content" do
@@ -90,7 +90,7 @@ RSpec.describe Towhee::HTML::Writer do
 
   it "contains multiple children" do
     result = subject.div { subject.text("Here: ") + subject.span { "foo" } }
-    expect(result.to_s).to eq "<div>\n  Here: <span>foo</span>\n</div>"
+    expect(result.to_s).to eq "<div>\n  Here: <span>foo</span>\n</div>\n"
   end
 
   it "raises on String::+" do
