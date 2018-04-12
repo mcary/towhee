@@ -20,6 +20,7 @@ module Towhee::HTML
     define_block_tag :ul
     define_block_tag :li
     define_inline_tag :a
+    (0..6).each { |n| define_block_tag "h#{n}".to_sym }
 
     def br
       follow_with_newline(empty_tag("br"))

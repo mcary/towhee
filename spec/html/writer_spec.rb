@@ -36,6 +36,13 @@ RSpec.describe Towhee::HTML::Writer do
     expect(result.to_s).to eq "<br />\n"
   end
 
+  it "writes header tags" do
+    (1..6).each do |n|
+      result = subject.public_send("h#{n}") { "hello" }
+      expect(result.to_s).to eq "<h#{n}>\n  hello\n</h#{n}>\n"
+    end
+  end
+
   it "writes ul with li" do
     result = subject.ul { subject.li { "hi" } }
     expect(result.to_s).to eq "<ul>\n  <li>\n    hi\n  </li>\n  \n</ul>\n"
