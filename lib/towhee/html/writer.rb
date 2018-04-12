@@ -58,6 +58,10 @@ module Towhee::HTML
       escape(str)
     end
 
+    def trust(str)
+      Fragment.new(str)
+    end
+
     def join_fragments(fragments)
       fragments.inject(Towhee::HTML::Fragment.new(""), &:+)
     end
@@ -119,10 +123,6 @@ module Towhee::HTML
     def validate_attr(name)
       raise "Invalid attribute name" if name.match(/[^-_:a-z0-9]/)
       name
-    end
-
-    def trust(str)
-      Fragment.new(str)
     end
   end
 end
