@@ -22,7 +22,7 @@ RSpec.describe Towhee::Blog::HomeView do
   end
 
   context "with a post" do
-    let(:posts) { [Towhee::Blog::Post.new(title: "Some Post")] }
+    let(:posts) { [Towhee::Blog::Post.new(title: "Some Post", slug: "aslug" )] }
     let(:view) { described_class.new(site, posts: posts) }
 
     it "renders posts" do
@@ -30,7 +30,11 @@ RSpec.describe Towhee::Blog::HomeView do
     end
 
     it "renders posts without escaping <li> tags" do
-      expect(view.render).to match /<li>\s*Some Post/m
+      expect(view.render).to match /<li>\s*<a[^<>]*>Some Post/m
+    end
+
+    it "links post to post page" do
+      expect(view.render).to match %{<a href="/posts/aslug.html"}
     end
   end
 end

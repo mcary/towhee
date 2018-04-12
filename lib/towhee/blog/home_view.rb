@@ -30,10 +30,22 @@ module Towhee::Blog
       @html.ul do
         @html.join_fragments(
           @posts.map do |post|
-            @html.li { post.title }
+            post_item(post)
           end
         )
       end
+    end
+
+    def post_item(post)
+      @html.li do
+        @html.a href: post_path(post) do
+          post.title
+        end
+      end
+    end
+
+    def post_path(post)
+      "/posts/#{post.slug}.html"
     end
 
     def empty_message
