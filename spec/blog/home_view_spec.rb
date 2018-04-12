@@ -5,6 +5,11 @@ require 'towhee/blog/post'
 RSpec.describe Towhee::Blog::HomeView do
   let(:site) { Towhee::Blog::Site.new(name: "Some Site") }
 
+  it "has root path" do
+    view = described_class.new(site)
+    expect(view.path).to eq "index.html"
+  end
+
   it "renders site name" do
     view = described_class.new(site)
     expect(view.render).to match /Some Site Home/
