@@ -28,9 +28,11 @@ module Towhee::Blog
 
     def post_list
       @html.ul do
-        @posts.map do |post|
-          @html.li { post.title }
-        end.inject(Towhee::HTML::Fragment.new(""), &:+)
+        @html.join_fragments(
+          @posts.map do |post|
+            @html.li { post.title }
+          end
+        )
       end
     end
 

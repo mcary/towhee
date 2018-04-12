@@ -128,6 +128,17 @@ RSpec.describe Towhee::HTML::Writer do
     expect(result.to_s).to eq "<div>\n  Here: <span>foo</span>\n</div>\n"
   end
 
+  it "joins fragments" do
+    result = subject.ul do
+      subject.join_fragments([
+        subject.li { "one" },
+        subject.li { "two" },
+      ])
+    end
+    expect(result.to_s).to eq \
+      "<ul>\n  <li>\n    one\n  </li>\n  <li>\n    two\n  </li>\n  \n</ul>\n"
+  end
+
   it "raises on String::+" do
     expect {
       subject.div { "Here: " + subject.span { "foo" } }

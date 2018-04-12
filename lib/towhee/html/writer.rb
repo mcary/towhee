@@ -58,6 +58,10 @@ module Towhee::HTML
       escape(str)
     end
 
+    def join_fragments(fragments)
+      fragments.inject(Towhee::HTML::Fragment.new(""), &:+)
+    end
+
     private
 
     def block_tag(tag_name, attributes={})
