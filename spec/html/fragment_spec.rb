@@ -26,4 +26,15 @@ RSpec.describe Towhee::HTML::Fragment do
       "no implicit conversion of Towhee::HTML::Fragment into String",
     )
   end
+
+  it "refuses to add a string" do
+    expect {
+      klass.new("foo") + "bar"
+    }.to raise_error(
+      TypeError,
+      "no implicit conversion of String into Towhee::HTML::Fragment\n" +
+        "Call Writer#text for untrusted text or Writer#trust for " +
+        "content that you know is clean of malicious markup.",
+    )
+  end
 end

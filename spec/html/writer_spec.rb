@@ -148,6 +148,17 @@ RSpec.describe Towhee::HTML::Writer do
     )
   end
 
+  it "gives helpful error when appending text to HTML" do
+    expect {
+      subject.div { "hi" } + "\n"
+    }.to raise_error(
+      TypeError,
+      "no implicit conversion of String into Towhee::HTML::Fragment\n" +
+        "Call Writer#text for untrusted text or Writer#trust for " +
+        "content that you know is clean of malicious markup.",
+    )
+  end
+
   it "runs fast" do
     long_str = "asdfasdf " * 12 # Enough to allocate on the heap
     result = benchmark "writer spec" do

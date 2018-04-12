@@ -7,7 +7,8 @@ module Towhee::HTML
     end
 
     def +(other)
-      Fragment.new(@str + other.str)
+      ensure_not_string!(other)
+      Fragment.new(@str + other.fragment_str)
     end
 
     def to_s
@@ -16,6 +17,19 @@ module Towhee::HTML
 
     protected
 
-    attr_reader :str
+    def fragment_str
+      @str
+    end
+
+    private
+
+    def ensure_not_string!(other)
+      if other.is_a? String
+        raise TypeError,
+          "no implicit conversion of String into Towhee::HTML::Fragment\n" +
+            "Call Writer#text for untrusted text or Writer#trust for " +
+            "content that you know is clean of malicious markup."
+      end
+    end
   end
 end
