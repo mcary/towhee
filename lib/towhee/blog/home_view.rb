@@ -15,16 +15,28 @@ module Towhee::Blog
 
     def render
       @html.html do
+        head + body
+      end.to_s
+    end
+
+    private
+
+    def head
+      @html.head do
+        @html.title { @site.name }
+      end
+    end
+
+    def body
+      @html.body do
         @html.h1 { @site.name + " Home" } +
           if @posts.any?
             post_list
           else
             empty_message
           end
-      end.to_s
+      end
     end
-
-    private
 
     def post_list
       @html.ul do

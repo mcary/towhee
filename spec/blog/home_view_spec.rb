@@ -12,6 +12,10 @@ RSpec.describe Towhee::Blog::HomeView do
       expect(view.path).to eq "index.html"
     end
 
+    it "renders title with site name and no joining punctuation" do
+      expect(view.render).to match /<title>Some Site</
+    end
+
     it "renders site name" do
       expect(view.render).to match /Some Site Home/
     end
