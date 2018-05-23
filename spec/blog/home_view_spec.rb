@@ -20,6 +20,10 @@ RSpec.describe Towhee::Blog::HomeView do
       expect(view.render).to match /Some Site Home/
     end
 
+    it "links to stylesheet" do
+      expect(view.render).to match /<link rel="stylesheet".*href="style.css"/
+    end
+
     it "renders empty message" do
       expect(view.render).to match /No posts yet./
     end

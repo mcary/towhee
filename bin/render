@@ -9,7 +9,8 @@ require 'fileutils'
 
 path = "./tmp/site"
 FileUtils.rm_rf path
-FileUtils.mkdir path
+FileUtils.cp_r("public/", "#{path}/")
+
 file_system = Towhee::Prerender::FileSystem.new(path)
 
 repo = Towhee::Blog::Repository.new(
