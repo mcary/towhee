@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'towhee/blog/repository'
+require 'towhee/blog/app'
+require 'towhee/blog/site'
+require 'towhee/blog/post'
+require 'towhee/prerender/file_system'
+require 'fileutils'
+
+path = "./tmp/site"
+FileUtils.rm_rf path
+FileUtils.mkdir path
+file_system = Towhee::Prerender::FileSystem.new(path)
+
+repo = Towhee::Blog::Repository.new(
+  sites: [Towhee::Blog::Site.new(name: "Foo")],
+#  posts: [Towhee::Blog::Post.new(
+#    title: "Hello World",
+#    slug: "hello",
+#    body: "<p>Hello <i>World</i>"
+#  )],
+)
+app = Towhee::Blog::App.new(fs: file_system, repo: repo)
+
+app.prerender
