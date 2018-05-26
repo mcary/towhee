@@ -7,9 +7,7 @@ require 'towhee/blog/post'
 require 'towhee/prerender/file_system'
 require 'fileutils'
 
-path = "./tmp/site"
-FileUtils.rm_rf path
-FileUtils.cp_r("public/", "#{path}/")
+path = "./frontend/dist"
 
 file_system = Towhee::Prerender::FileSystem.new(path)
 
