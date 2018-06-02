@@ -17,7 +17,15 @@ RSpec.describe Towhee::Blog::Repository do
     end
   end
 
-  def repository(*args)
-    described_class.new(*args)
+  context "one post" do
+    it "returns one" do
+      # Posts aren't linked to sites just yet; maybe someday.
+      repo = repository(sites: [], posts: [:a_post])
+      expect(repo.site_posts(nil).size).to eq 1
+    end
+  end
+
+  def repository(**args)
+    described_class.new(posts: [], **args)
   end
 end

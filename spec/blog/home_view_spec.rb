@@ -21,7 +21,7 @@ RSpec.describe Towhee::Blog::HomeView do
     end
 
     it "links to stylesheet" do
-      expect(view.render).to match /<link rel="stylesheet".*href="style.css"/
+      expect(view.render).to match /<link rel="stylesheet".*href="main.css"/
     end
 
     it "renders empty message" do

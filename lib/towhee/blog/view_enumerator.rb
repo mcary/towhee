@@ -7,7 +7,7 @@ module Towhee::Blog
     end
 
     def views_for_model(model)
-      [HomeView.new(model)]
+      [HomeView.new(model, posts: @repo.site_posts(model))]
     end
   end
 end

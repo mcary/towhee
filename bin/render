@@ -13,11 +13,11 @@ file_system = Towhee::Prerender::FileSystem.new(path)
 
 repo = Towhee::Blog::Repository.new(
   sites: [Towhee::Blog::Site.new(name: "Foo")],
-#  posts: [Towhee::Blog::Post.new(
-#    title: "Hello World",
-#    slug: "hello",
-#    body: "<p>Hello <i>World</i>"
-#  )],
+  posts: [Towhee::Blog::Post.new(
+    title: "Hello World",
+    slug: "hello",
+    body: "<p>Hello <i>World</i>",
+  )],
 )
 app = Towhee::Blog::App.new(fs: file_system, repo: repo)
 
