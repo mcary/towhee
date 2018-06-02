@@ -24,7 +24,8 @@ module Towhee::Blog
     def head
       @html.head do
         @html.title { @site.name } +
-          @html.link(rel: "stylesheet", href: "style.css")
+          @html.script(src: "main.js")
+          @html.link(rel: "stylesheet", href: "main.css")
       end
     end
 
