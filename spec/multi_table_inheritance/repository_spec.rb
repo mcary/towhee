@@ -112,6 +112,31 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
     end
   end
 
+  context "updating a record" do
+    before do
+      query = "update blogs set author = :author where entity_id = :entity_id"
+      allow(adapter).to receive(:exec_update).
+        with(query, entity_id: site_id, author: "Someone Else").
+        and_return(nil) # Might return something; we don't need it.
+
+      query = "update sites set name = :name where entity_id = :entity_id"
+      allow(adapter).to receive(:exec_update).
+        with(query, entity_id: site_id, name: "My Site"). # (no change)
+        and_return(nil) # Might return something; we don't need it.
+    end
+
+    it "stores a record" do
+      blog = Blog.new("name" => "My Site", "author" => "Someone")
+      class << blog
+        attr_writer :author
+        attr_accessor :entity_id
+      end
+      blog.author = "Someone Else"
+      blog.entity_id = site_id
+      subject.update(blog)
+    end
+  end
+
 
   class Schema < Struct.new(:table_name, :parent_type, :attributes)
     def load(row)

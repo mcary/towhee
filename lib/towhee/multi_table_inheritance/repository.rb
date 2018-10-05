@@ -57,6 +57,15 @@ module Towhee::MultiTableInheritance
       entity_id
     end
 
+    def update(obj)
+      type = obj.class.name
+      entity_id = obj.entity_id
+      walk_lineage(type) do |type, schema|
+        row = schema.dump(obj)
+        do_update(schema.table_name, entity_id, row)
+      end
+    end
+
     private
 
     def select_all_from(table, key, vals)
@@ -90,6 +99,14 @@ module Towhee::MultiTableInheritance
       @adapter.exec_insert(
         "insert into #{table} (#{cols}) values (#{vals})",
         row,
+      )
+    end
+
+    def do_update(table, entity_id, row)
+      assigns = row.keys.map {|k| "#{k} = :#{k}" }.join(", ")
+      @adapter.exec_update(
+        "update #{table} set #{assigns} where entity_id = :entity_id",
+        row.merge(entity_id: entity_id),
       )
     end
 
