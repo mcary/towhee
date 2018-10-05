@@ -46,6 +46,17 @@ module Towhee::MultiTableInheritance
       end
     end
 
+    def create(obj)
+      type = obj.class.name
+      entity_id = insert(@root_table, type: type)
+      row_defaults = { entity_id: entity_id }
+      walk_lineage(type) do |type, schema|
+        row = schema.dump(obj)
+        insert(schema.table_name, row_defaults.merge(row))
+      end
+      entity_id
+    end
+
     private
 
     def select_all_from(table, key, vals)
@@ -70,6 +81,15 @@ module Towhee::MultiTableInheritance
       @adapter.select_one(
         "select * from #{table} where #{key} = :#{key}",
         key => val,
+      )
+    end
+
+    def insert(table, row)
+      cols = row.keys.join(", ")
+      vals = row.keys.map {|k| ":#{k}" }.join(", ")
+      @adapter.exec_insert(
+        "insert into #{table} (#{cols}) values (#{vals})",
+        row,
       )
     end
 

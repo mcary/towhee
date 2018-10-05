@@ -5,8 +5,8 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
     described_class.new(
       adapter: adapter,
       schemas: {
-        "Site" => Schema.new("sites"),
-        "Blog" => Schema.new("blogs", "Site"),
+        "Site" => Schema.new("sites", nil, [:name]),
+        "Blog" => Schema.new("blogs", "Site", [:author]),
       },
     )
   end
@@ -14,7 +14,7 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
   let(:site_id) { 1 }
   let(:adapter) { double(:adapter) }
 
-  context "happy path" do
+  context "loading happy path" do
     before do
       query = "select * from entities where id = :id"
       allow(adapter).to receive(:select_one).with(query, id: site_id).
@@ -89,7 +89,31 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
     end
   end
 
-  class Schema < Struct.new(:table_name, :parent_type)
+  context "creating a record" do
+    before do
+      query = "insert into entities (type) values (:type)"
+      allow(adapter).to receive(:exec_insert).with(query, type: "Blog").
+        and_return(site_id)
+
+      query = "insert into blogs (entity_id, author) values (:entity_id, :author)"
+      allow(adapter).to receive(:exec_insert).
+        with(query, entity_id: site_id, author: "Someone").
+        and_return(nil) # Might return something; we don't need it.
+
+      query = "insert into sites (entity_id, name) values (:entity_id, :name)"
+      allow(adapter).to receive(:exec_insert).
+        with(query, entity_id: site_id, name: "My Site").
+        and_return(nil) # Might return something; we don't need it.
+    end
+
+    it "stores a record" do
+      id = subject.create(Blog.new("name" => "My Site", "author" => "Someone"))
+      expect(id).to eq site_id
+    end
+  end
+
+
+  class Schema < Struct.new(:table_name, :parent_type, :attributes)
     def load(row)
       # If we passed a symbol-keyed Hash, the receiver could
       # use kwargs to destructure it.  However, typically the receiver
@@ -97,6 +121,12 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
       # its parent class.  So maybe the flexibility of String keys
       # is important.
       Object.const_get(row["type"]).new(row)
+    end
+
+    def dump(obj)
+      row = attributes.each_with_object({}) do |attr, row|
+        row[attr] = obj.public_send(attr)
+      end
     end
   end
 
