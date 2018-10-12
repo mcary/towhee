@@ -13,9 +13,11 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
   end
 
   let(:site_id) { 1 }
-  let(:adapter) { double(:adapter) }
+  let(:adapter) { double(:connection_adapter) }
   let :active_record_adapter do
-    Towhee::MultiTableInheritance::ActiveRecordAdapter.new(adapter: adapter)
+    Towhee::MultiTableInheritance::ActiveRecordAdapter.new(
+      connection_adapter: adapter,
+    )
   end
 
   context "loading happy path" do

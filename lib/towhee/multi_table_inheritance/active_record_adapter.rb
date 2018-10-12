@@ -2,8 +2,8 @@ require 'towhee/multi_table_inheritance'
 
 module Towhee::MultiTableInheritance
   class ActiveRecordAdapter
-    def initialize(adapter:)
-      @adapter = adapter
+    def initialize(connection_adapter:)
+      @adapter = connection_adapter
     end
 
     def select_all_from(table, key, vals)
