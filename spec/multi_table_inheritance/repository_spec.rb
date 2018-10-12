@@ -1,9 +1,10 @@
 require 'towhee/multi_table_inheritance/repository'
+require 'towhee/multi_table_inheritance/active_record_adapter'
 
 RSpec.describe Towhee::MultiTableInheritance::Repository do
   subject do
     described_class.new(
-      adapter: adapter,
+      adapter: active_record_adapter,
       schemas: {
         "Site" => Schema.new("sites", nil, [:name]),
         "Blog" => Schema.new("blogs", "Site", [:author]),
@@ -13,6 +14,9 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
 
   let(:site_id) { 1 }
   let(:adapter) { double(:adapter) }
+  let :active_record_adapter do
+    Towhee::MultiTableInheritance::ActiveRecordAdapter.new(adapter: adapter)
+  end
 
   context "loading happy path" do
     before do

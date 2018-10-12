@@ -9,11 +9,11 @@ module Towhee::MultiTableInheritance
     end
 
     def find(id)
-      row = select_from(@root_table, :id, id)
+      row = @adapter.select_from(@root_table, :id, id)
       type = row.fetch("type")
 
       walk_lineage(type) do |type, schema|
-        type_row = select_from(schema.table_name, :entity_id, id)
+        type_row = @adapter.select_from(schema.table_name, :entity_id, id)
         row = row.merge(type_row)
       end
 
@@ -21,7 +21,7 @@ module Towhee::MultiTableInheritance
     end
 
     def find_all(ids)
-      rows = select_all_from(@root_table, :id, ids)
+      rows = @adapter.select_all_from(@root_table, :id, ids)
       types_by_id = rows.map(&values_at("id", "type")).to_h
       types = types_by_id.values.uniq
 
@@ -29,7 +29,8 @@ module Towhee::MultiTableInheritance
       types.each do |type|
         walk_lineage(type) do |type, schema|
           unless already_covered?(type, rows_by_type)
-            type_rows = select_all_from(schema.table_name, :entity_id, ids)
+            type_rows =
+              @adapter.select_all_from(schema.table_name, :entity_id, ids)
             rows_by_type[type] = index_by("entity_id", type_rows)
           end
         end
@@ -48,11 +49,11 @@ module Towhee::MultiTableInheritance
 
     def create(obj)
       type = obj.class.name
-      entity_id = insert(@root_table, type: type)
+      entity_id = @adapter.insert(@root_table, type: type)
       row_defaults = { entity_id: entity_id }
       walk_lineage(type) do |type, schema|
         row = schema.dump(obj)
-        insert(schema.table_name, row_defaults.merge(row))
+        @adapter.insert(schema.table_name, row_defaults.merge(row))
       end
       entity_id
     end
@@ -62,18 +63,11 @@ module Towhee::MultiTableInheritance
       entity_id = obj.entity_id
       walk_lineage(type) do |type, schema|
         row = schema.dump(obj)
-        do_update(schema.table_name, entity_id, row)
+        @adapter.update(schema.table_name, entity_id, row)
       end
     end
 
     private
-
-    def select_all_from(table, key, vals)
-      @adapter.select_all(
-        "select * from #{table} where #{key} in :#{key}s",
-        key => vals,
-      )
-    end
 
     def walk_lineage(type)
       begin
@@ -84,30 +78,6 @@ module Towhee::MultiTableInheritance
 
     def already_covered?(type, rows_by_type)
       rows_by_type.key?(type)
-    end
-
-    def select_from(table, key, val)
-      @adapter.select_one(
-        "select * from #{table} where #{key} = :#{key}",
-        key => val,
-      )
-    end
-
-    def insert(table, row)
-      cols = row.keys.join(", ")
-      vals = row.keys.map {|k| ":#{k}" }.join(", ")
-      @adapter.exec_insert(
-        "insert into #{table} (#{cols}) values (#{vals})",
-        row,
-      )
-    end
-
-    def do_update(table, entity_id, row)
-      assigns = row.keys.map {|k| "#{k} = :#{k}" }.join(", ")
-      @adapter.exec_update(
-        "update #{table} set #{assigns} where entity_id = :entity_id",
-        row.merge(entity_id: entity_id),
-      )
     end
 
     def schema_for(type)
