@@ -14,6 +14,7 @@ module Towhee::MultiTableInheritance
 
       walk_lineage(type) do |type, schema|
         type_row = @adapter.select_from(schema.table_name, :entity_id, id)
+        raise unless type_row
         row = row.merge(type_row)
       end
 
@@ -38,10 +39,12 @@ module Towhee::MultiTableInheritance
 
       rows.map do |row|
         type = row.fetch("type")
+        id = row.fetch("id")
         walk_lineage(type) do |type, schema|
           row = row.merge(rows_by_type.
                           fetch(type).
-                          fetch(row.fetch("id")))
+                          fetch(id))
+          id = row.fetch("entity_id")
         end
         schema_for(type).load(row)
       end
