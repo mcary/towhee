@@ -2,8 +2,8 @@ require 'towhee/multi_table_inheritance'
 
 module Towhee::MultiTableInheritance
   class Repository
-    def initialize(adapter:, schemas:)
-      @adapter = adapter
+    def initialize(storage_adapter:, schemas:)
+      @adapter = storage_adapter
       @schemas = schemas
       @root_table = "entities"
     end

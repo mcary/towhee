@@ -4,7 +4,7 @@ require 'towhee/multi_table_inheritance/active_record_adapter'
 RSpec.describe Towhee::MultiTableInheritance::Repository do
   subject do
     described_class.new(
-      adapter: active_record_adapter,
+      storage_adapter: active_record_adapter,
       schemas: {
         "Site" => Schema.new("sites", nil, [:name]),
         "Blog" => Schema.new("blogs", "Site", [:author]),

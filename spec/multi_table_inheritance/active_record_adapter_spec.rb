@@ -1,6 +1,8 @@
 require 'towhee/multi_table_inheritance/active_record_adapter'
+require_relative 'storage_adapter_interface'
 
 RSpec.describe Towhee::MultiTableInheritance::ActiveRecordAdapter do
+  include_examples "StorageAdapter interface"
   let(:site_id) { 1 }
   let(:connection_adapter) { double(:connection_adapter) }
   subject do

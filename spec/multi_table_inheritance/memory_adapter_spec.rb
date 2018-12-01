@@ -1,6 +1,9 @@
 require 'towhee/multi_table_inheritance/memory_adapter'
+require_relative 'storage_adapter_interface'
 
 RSpec.describe Towhee::MultiTableInheritance::MemoryAdapter do
+  include_examples "StorageAdapter interface"
+
   it "round-trips a row" do
     id = subject.insert("foos", "attr1" => "val1")
     row = subject.select_from("foos", "attr1", "val1")
