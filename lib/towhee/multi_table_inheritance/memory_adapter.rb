@@ -53,7 +53,7 @@ module Towhee::MultiTableInheritance
     end
 
     def sanitize_val(val)
-      raise unless val.is_a? String
+      raise unless val.is_a?(String) || val.is_a?(Numeric)
       val
     end
 

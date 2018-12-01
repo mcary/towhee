@@ -1,10 +1,10 @@
 require 'towhee/multi_table_inheritance/repository'
-require 'towhee/multi_table_inheritance/active_record_adapter'
+require 'towhee/multi_table_inheritance/memory_adapter'
 
 RSpec.describe Towhee::MultiTableInheritance::Repository do
   subject do
     described_class.new(
-      storage_adapter: active_record_adapter,
+      storage_adapter: adapter,
       schemas: {
         "Site" => Schema.new("sites", nil, [:name]),
         "Blog" => Schema.new("blogs", "Site", [:author]),
@@ -13,26 +13,13 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
   end
 
   let(:site_id) { 1 }
-  let(:adapter) { double(:connection_adapter) }
-  let :active_record_adapter do
-    Towhee::MultiTableInheritance::ActiveRecordAdapter.new(
-      connection_adapter: adapter,
-    )
-  end
+  let(:adapter) { Towhee::MultiTableInheritance::MemoryAdapter.new }
 
   context "loading happy path" do
     before do
-      query = "select * from entities where id = :id"
-      allow(adapter).to receive(:select_one).with(query, id: site_id).
-        and_return({"type" => "Blog"})
-
-      query = "select * from blogs where entity_id = :entity_id"
-      allow(adapter).to receive(:select_one).with(query, entity_id: site_id).
-        and_return({"author" => "Someone"})
-
-      query = "select * from sites where entity_id = :entity_id"
-      allow(adapter).to receive(:select_one).with(query, entity_id: site_id).
-        and_return({"name" => "My Site"})
+      id = adapter.insert("entities", type: "Blog")
+      adapter.insert("blogs", author: "Someone", entity_id: id)
+      adapter.insert("sites", name: "My Site", entity_id: id)
     end
 
     it "loads a record" do
@@ -46,9 +33,7 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
 
   context "invalid type" do
     before do
-      query = "select * from entities where id = :id"
-      allow(adapter).to receive(:select_one).with(query, id: site_id).
-        and_return({"type" => "NonExistent"})
+      adapter.insert("entities", type: "NonExistent")
     end
 
     it "notices missing type early" do
@@ -59,32 +44,21 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
   end
 
   context "multiple records" do
-    let(:ids) { [1, 2] }
-
     before do
-      query = "select * from entities where id in :ids"
-      allow(adapter).to receive(:select_all).with(query, id: ids).
-        and_return([
-          {"id" => 2, "type" => "Site"},
-          {"id" => 1, "type" => "Blog"},
-        ])
+      @ids = []
 
-      query = "select * from sites where entity_id in :entity_ids"
-      allow(adapter).to receive(:select_all).with(query, entity_id: ids).
-        and_return([
-          {"entity_id" => 1, "name" => "Blog"},
-          {"entity_id" => 2, "name" => "Site"},
-        ])
+      id = adapter.insert("entities", type: "Site")
+      adapter.insert("sites", name: "Site", entity_id: id)
+      @ids.push id
 
-      query = "select * from blogs where entity_id in :entity_ids"
-      allow(adapter).to receive(:select_all).with(query, entity_id: ids).
-        and_return([
-          {"entity_id" => 1, "author" => "Someone"},
-        ])
+      id = adapter.insert("entities", type: "Blog")
+      adapter.insert("sites", name: "Blog", entity_id: id)
+      adapter.insert("blogs", author: "Someone", entity_id: id)
+      @ids.push id
     end
 
     it "loads a record" do
-      objs = subject.find_all(ids)
+      objs = subject.find_all(@ids)
       expect(objs).not_to be_nil
       expect(objs.size).to eq 2
       objs.sort_by! { |obj| obj.name }
@@ -96,50 +70,45 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
   end
 
   context "creating a record" do
-    before do
-      query = "insert into entities (type) values (:type)"
-      allow(adapter).to receive(:exec_insert).with(query, type: "Blog").
-        and_return(site_id)
-
-      query = "insert into blogs (entity_id, author) values (:entity_id, :author)"
-      allow(adapter).to receive(:exec_insert).
-        with(query, entity_id: site_id, author: "Someone").
-        and_return(nil) # Might return something; we don't need it.
-
-      query = "insert into sites (entity_id, name) values (:entity_id, :name)"
-      allow(adapter).to receive(:exec_insert).
-        with(query, entity_id: site_id, name: "My Site").
-        and_return(nil) # Might return something; we don't need it.
-    end
-
     it "stores a record" do
       id = subject.create(Blog.new("name" => "My Site", "author" => "Someone"))
-      expect(id).to eq site_id
+
+      row = adapter.select_from("entities", :id, id)
+      expect(row).to eq("id" => id, "type" => "Blog")
+      row = adapter.select_from("blogs", :entity_id, id)
+      expect(row).to include("entity_id" => id, "author" => "Someone")
+      row = adapter.select_from("sites", :entity_id, id)
+      expect(row).to include("entity_id" => id, "name" => "My Site")
     end
   end
 
   context "updating a record" do
     before do
-      query = "update blogs set author = :author where entity_id = :entity_id"
-      allow(adapter).to receive(:exec_update).
-        with(query, entity_id: site_id, author: "Someone Else").
-        and_return(nil) # Might return something; we don't need it.
+      id = adapter.insert("entities", type: "Blog")
+      adapter.insert("sites", name: "Blog", entity_id: id)
+      adapter.insert("blogs", author: "Someone", entity_id: id)
+      @id = id
 
-      query = "update sites set name = :name where entity_id = :entity_id"
-      allow(adapter).to receive(:exec_update).
-        with(query, entity_id: site_id, name: "My Site"). # (no change)
-        and_return(nil) # Might return something; we don't need it.
+      id = adapter.insert("entities", type: "Blog")
+      adapter.insert("sites", name: "Other Blog", entity_id: id)
+      adapter.insert("blogs", author: "Other Someone", entity_id: id)
+      @other_id = id
     end
 
     it "stores a record" do
-      blog = Blog.new("name" => "My Site", "author" => "Someone")
+      new_author = "Someone Else"
+      blog = Blog.new("name" => "My Site", "author" => new_author)
       class << blog
-        attr_writer :author
+        # Updatable models need this additional attribute
         attr_accessor :entity_id
       end
-      blog.author = "Someone Else"
-      blog.entity_id = site_id
+      blog.entity_id = @id
       subject.update(blog)
+
+      row = adapter.select_from("blogs", :entity_id, @id)
+      expect(row).to include("author" => new_author)
+      row = adapter.select_from("blogs", :entity_id, @other_id)
+      expect(row).to include("author" => "Other Someone") # unchanged
     end
   end
 
