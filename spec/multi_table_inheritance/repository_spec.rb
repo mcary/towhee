@@ -15,7 +15,7 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
   let(:site_id) { 1 }
   let(:adapter) { Towhee::MultiTableInheritance::MemoryAdapter.new }
 
-  context "loading happy path" do
+  context "existing record" do
     before do
       id = adapter.insert("entities", type: "Blog")
       adapter.insert("blogs", author: "Someone", entity_id: id)
@@ -82,7 +82,7 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
     end
   end
 
-  context "updating a record" do
+  context "existing rows" do
     before do
       id = adapter.insert("entities", type: "Blog")
       adapter.insert("sites", name: "Blog", entity_id: id)
@@ -95,7 +95,7 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
       @other_id = id
     end
 
-    it "stores a record" do
+    it "updates the record" do
       new_author = "Someone Else"
       blog = Blog.new("name" => "My Site", "author" => new_author)
       class << blog
@@ -109,6 +109,19 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
       expect(row).to include("author" => new_author)
       row = adapter.select_from("blogs", :entity_id, @other_id)
       expect(row).to include("author" => "Other Someone") # unchanged
+    end
+
+    it "deletes a record" do
+      expect {
+        subject.delete(@id)
+      }.to change {
+        record_exists(@id)
+      }.from(true).to(false)
+      expect(record_exists(@other_id)).to eq true
+    end
+
+    def record_exists(id)
+      subject.find_all([id]).any?
     end
   end
 

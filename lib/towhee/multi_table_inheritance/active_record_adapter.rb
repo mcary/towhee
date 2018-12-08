@@ -36,5 +36,12 @@ module Towhee::MultiTableInheritance
         row.merge(entity_id: entity_id),
       )
     end
+
+    def delete_from(table, key, val)
+      @adapter.exec_delete(
+        "delete from #{table} where #{key} = :#{key}",
+        key => val,
+      )
+    end
   end
 end

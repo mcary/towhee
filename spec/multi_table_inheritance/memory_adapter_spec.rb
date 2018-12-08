@@ -122,4 +122,17 @@ RSpec.describe Towhee::MultiTableInheritance::MemoryAdapter do
       expect(row["attr1"]).to eq "val1"
     end
   end
+
+  describe "#delete_from" do
+    it "deletes" do
+      row = { "attr1" => "val1" }
+      id = subject.insert("foos", row)
+      row.merge!("id" => 1)
+      expect {
+        subject.delete_from("foos", "id", id)
+      }.to change {
+        subject.select_from("foos", "id", id)
+      }.from(row).to(nil)
+    end
+  end
 end

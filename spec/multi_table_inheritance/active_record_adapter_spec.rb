@@ -72,4 +72,16 @@ RSpec.describe Towhee::MultiTableInheritance::ActiveRecordAdapter do
       subject.update("blogs", site_id, author: "Someone Else")
     end
   end
+
+  describe "#delete_from" do
+    before do
+      query = "delete from entities where id = :id"
+      expect(connection_adapter).to receive(:exec_delete).
+        with(query, id: site_id)
+    end
+
+    it "loads a row" do
+      subject.delete_from("entities", :id, site_id)
+    end
+  end
 end

@@ -70,6 +70,17 @@ module Towhee::MultiTableInheritance
       end
     end
 
+    def delete(id)
+      row = @adapter.select_from(@root_table, :id, id)
+      type = row.fetch("type")
+
+      walk_lineage(type) do |type, schema|
+        type_row = @adapter.delete_from(schema.table_name, :entity_id, id)
+      end
+
+      @adapter.delete_from(@root_table, :id, id)
+    end
+
     private
 
     def walk_lineage(type)

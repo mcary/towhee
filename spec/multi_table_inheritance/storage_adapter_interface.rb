@@ -12,5 +12,6 @@ RSpec.shared_examples "StorageAdapter interface" do
     must { respond_to(:update).with(3).arguments }
     must { respond_to(:select_from).with(3).arguments }
     must { respond_to(:select_all_from).with(3).arguments }
+    must { respond_to(:delete_from).with(3).arguments }
   end
 end

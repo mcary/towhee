@@ -38,6 +38,14 @@ module Towhee::MultiTableInheritance
       nil
     end
 
+    def delete_from(table, key, val)
+      key = sanitize_key(key)
+      rows = @data[table].reject! do |row|
+        val == row[key]
+      end
+      nil
+    end
+
     private
 
     def next_id
