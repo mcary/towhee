@@ -10,6 +10,7 @@ module Towhee::MultiTableInheritance
 
     def find(id)
       row = @adapter.select_from(@root_table, :id, id)
+      raise KeyError, "entity not found: #{id}" unless row
       type = row.fetch("type")
 
       walk_lineage(type) do |type, schema|

@@ -69,8 +69,8 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
     end
   end
 
-  context "creating a record" do
-    it "stores a record" do
+  context "empty repository" do
+    it "creates a record" do
       id = subject.create(Blog.new("name" => "My Site", "author" => "Someone"))
 
       row = adapter.select_from("entities", :id, id)
@@ -79,6 +79,13 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
       expect(row).to include("entity_id" => id, "author" => "Someone")
       row = adapter.select_from("sites", :entity_id, id)
       expect(row).to include("entity_id" => id, "name" => "My Site")
+    end
+
+    it "raises on non-existent ID" do
+      non_existent = 42
+      expect {
+        subject.find(non_existent)
+      }.to raise_error(KeyError, "entity not found: #{non_existent}")
     end
   end
 
