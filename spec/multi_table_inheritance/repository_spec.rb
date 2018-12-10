@@ -67,6 +67,22 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
       expect(objs.last).to be_a Site
       expect(objs.last.name).to eq "Site"
     end
+
+    it "queries for a record" do
+      objs = subject.query("Site", :name, "Blog")
+      expect(objs.size).to eq 1
+      obj = objs.first
+      expect(obj.name).to eq "Blog"
+      expect(obj).not_to respond_to :author
+    end
+
+    it "queries for a record by child class attribute" do
+      objs = subject.query("Blog", :author, "Someone")
+      expect(objs.size).to eq 1
+      obj = objs.first
+      expect(obj.name).to eq "Blog"
+      expect(obj).to respond_to :author
+    end
   end
 
   context "empty repository" do
@@ -140,13 +156,21 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
       # will not know about _all_ the keys and will forward some to
       # its parent class.  So maybe the flexibility of String keys
       # is important.
-      Object.const_get(row["type"]).new(row)
+      klass = table_name.sub(/s$/, "")
+      # row["type"] is another candidate for this info, but it is not
+      # correct in the case of #query.
+      klass[0] = klass[0].upcase
+      Object.const_get(klass).new(row)
     end
 
     def dump(obj)
       row = attributes.each_with_object({}) do |attr, row|
         row[attr] = obj.public_send(attr)
       end
+    end
+
+    def has?(attr)
+      attributes.include? attr.to_sym
     end
   end
 

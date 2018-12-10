@@ -20,6 +20,33 @@ module Towhee::MultiTableInheritance
       select_all_from(table, key, [val]).first
     end
 
+    def join(table, joins, filter_col, filter_op, filter_val)
+      filter_table, filter_column = filter_col
+      table, filter_table, filter_column =
+        [table, filter_table, filter_column].map(&method(:sanitize_key))
+      joins = joins.map(&method(:sanitize_key))
+
+      op_methods = { "=" => :== }
+      op_method = op_methods.fetch(filter_op)
+      rows = @data.fetch(filter_table).select do |row|
+        row.fetch(filter_column).public_send(op_method, filter_val)
+      end
+      id_col = table == filter_table ? "id" : "entity_id"
+      ids = rows.map { |row| row.fetch(id_col) }
+
+      rows = ids.map do |id|
+        [table, *joins].reverse.inject(Hash.new) do |merged_row, t|
+          id_col = table == t ? "id" : "entity_id"
+          row = @data.fetch(t).find do |row|
+            row.fetch(id_col) == id
+          end
+          merged_row.merge(row)
+        end
+      end
+
+      clone rows
+    end
+
     def insert(table, row)
       row = normalize_row(row)
       internal_row = clone(row)

@@ -46,6 +46,35 @@ RSpec.describe Towhee::MultiTableInheritance::ActiveRecordAdapter do
     end
   end
 
+  describe "#join" do
+    let(:ids) { [1, 2] }
+
+    before do
+      query = "select * from entities\n" +
+        "inner join sites on entities.id = sites.entity_id\n" +
+        "inner join blogs on entities.id = blogs.entity_id\n" +
+        "where sites.name = :name"
+      allow(connection_adapter).to receive(:select_all).
+        with(query, "name" => "Blog").
+        and_return([{
+          "id" => 1,
+          "entity_id" => 1,
+          "type" => "Blog",
+          "name" => "Blog",
+          "author" => "..."
+        }])
+    end
+
+    it "loads rows across tables" do
+      rows = subject.join("entities", ["sites", "blogs"],
+                          ["sites", "name"], "=", "Blog")
+      expect(rows.size).to eq 1
+      expect(rows.first).to include("name" => "Blog")
+      expect(rows.first).to include("author")
+      expect(rows.first).to include("id" => 1, "entity_id" => 1)
+    end
+  end
+
   describe "#insert" do
     before do
       query = "insert into entities (type) values (:type)"

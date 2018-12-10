@@ -20,6 +20,17 @@ module Towhee::MultiTableInheritance
       )
     end
 
+    def join(table, joins, filter_col, filter_op, filter_val)
+      filter_table, filter_column = filter_col
+      join_clauses = joins.
+        map { |t| "inner join #{t} on #{table}.id = #{t}.entity_id" }.
+        join("\n")
+      where_clause =
+        "where #{filter_table}.#{filter_column} #{filter_op} :#{filter_column}"
+      query = "select * from #{table}\n#{join_clauses}\n#{where_clause}"
+      @adapter.select_all(query, filter_column => filter_val)
+    end
+
     def insert(table, row)
       cols = row.keys.join(", ")
       vals = row.keys.map {|k| ":#{k}" }.join(", ")

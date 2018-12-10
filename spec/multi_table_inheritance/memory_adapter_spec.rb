@@ -95,6 +95,33 @@ RSpec.describe Towhee::MultiTableInheritance::MemoryAdapter do
     end
   end
 
+  describe "#join" do
+    it "loads rows across tables" do
+      id1 = subject.insert("entities", {})
+      subject.insert("foos", "foos_attr" => "val1", "entity_id" => id1)
+      subject.insert("bars", "bars_attr" => "value1", "entity_id" => id1)
+      id2 = subject.insert("entities", {})
+      subject.insert("foos", "foos_attr" => "val2", "entity_id" => id2)
+      subject.insert("bars", "bars_attr" => "value2", "entity_id" => id2)
+
+      rows = subject.join("entities", ["foos", "bars"],
+                          ["foos", "foos_attr"], "=", "val1")
+      expect(rows.size).to eq 1
+      expect(rows.first).to include("foos_attr" => "val1")
+      expect(rows.first).to include("bars_attr" => "value1")
+      expect(rows.first).to include("id" => id1, "entity_id" => id1)
+
+      rows = subject.join("entities", ["foos", "bars"],
+                          ["bars", "bars_attr"], "=", "value2")
+      expect(rows.size).to eq 1
+      expect(rows.first).to include("foos_attr" => "val2")
+      expect(rows.first).to include("bars_attr" => "value2")
+      expect(rows.first).to include("id" => id2, "entity_id" => id2)
+
+      expect(id1).not_to eq id2
+    end
+  end
+
   describe "#update" do
     it "mutates a row" do
       entity_id = "3"

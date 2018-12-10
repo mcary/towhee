@@ -51,6 +51,20 @@ module Towhee::MultiTableInheritance
       end
     end
 
+    def query(type, col, val)
+      joins = []
+      table = nil
+      walk_lineage(type) do |type, schema|
+        #joins.push [[schema.table_name, "entity_id"], ["entities", "id"]]
+        joins.push schema.table_name
+        table = schema.table_name if !table && schema.has?(col)
+      end
+      rows = @adapter.join("entities", joins, [table, col], "=", val)
+      rows.map do |row|
+        schema_for(type).load(row)
+      end
+    end
+
     def create(obj)
       type = obj.class.name
       entity_id = @adapter.insert(@root_table, type: type)
