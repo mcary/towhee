@@ -1,9 +1,11 @@
 RSpec.shared_examples "StorageAdapter interface" do
   describe "StorageAdapter interface" do
     def self.must(&block)
-      it "hi" do |example|
+      it "[dynamic]" do |example|
         matcher = instance_eval &block
-        example.metadata[:description] = "must #{matcher.description}"
+        desc = "must #{matcher.description}"
+        example.metadata[:description] = desc
+        example.metadata[:full_description].sub!("[dynamic]", desc)
         expect(subject).to matcher
       end
     end
