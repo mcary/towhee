@@ -10,8 +10,8 @@ module Towhee::MultiTableInheritance
 
     def select_all_from(table, key, vals)
       key = sanitize_key(key)
-      rows = @data[table].select do |row|
-        vals.include? row[key]
+      rows = @data.fetch(table).select do |row|
+        vals.include? row.fetch(key)
       end
       clone rows
     end
@@ -58,8 +58,8 @@ module Towhee::MultiTableInheritance
 
     def update(table, entity_id, row)
       row = normalize_row(row)
-      internal_row = @data[table].find do |row|
-        entity_id == row["entity_id"]
+      internal_row = @data.fetch(table).find do |row|
+        entity_id == row.fetch("entity_id")
       end
       internal_row.merge!(clone(row))
       nil
@@ -67,8 +67,8 @@ module Towhee::MultiTableInheritance
 
     def delete_from(table, key, val)
       key = sanitize_key(key)
-      rows = @data[table].reject! do |row|
-        val == row[key]
+      rows = @data.fetch(table).reject! do |row|
+        val == row.fetch(key)
       end
       nil
     end

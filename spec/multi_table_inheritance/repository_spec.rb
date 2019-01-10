@@ -98,6 +98,9 @@ RSpec.describe Towhee::MultiTableInheritance::Repository do
     end
 
     it "raises on non-existent ID" do
+      # Create necessary tables.
+      id = subject.create(Site.new("name" => "My Site"))
+
       non_existent = 42
       expect {
         subject.find(non_existent)
