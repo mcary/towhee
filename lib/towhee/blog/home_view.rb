@@ -19,6 +19,10 @@ module Towhee::Blog
       end.to_s
     end
 
+    def key
+      @site.name
+    end
+
     private
 
     def head

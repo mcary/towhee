@@ -25,6 +25,10 @@ module Towhee::Blog
       end.to_s
     end
 
+    def key
+      [@site.name, @post.slug]
+    end
+
     private
   end
 end

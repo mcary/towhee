@@ -23,6 +23,11 @@ RSpec.describe Towhee::Blog::Repository do
       repo = repository(sites: [], posts: [:a_post])
       expect(repo.site_posts(nil).size).to eq 1
     end
+
+    it "returns post's site" do
+      repo = repository(sites: [:a_site], posts: [:a_post])
+      expect(repo.post_site(nil)).to eq :a_site
+    end
   end
 
   def repository(**args)

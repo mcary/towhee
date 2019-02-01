@@ -9,7 +9,8 @@ module Towhee::Blog
     end
 
     def prerender
-      engine.batch_changed(@repo.all_sites)
+      engine.batch_changed(@repo.all_sites +
+                           @repo.site_posts(@repo.all_sites.first))
     end
 
     private

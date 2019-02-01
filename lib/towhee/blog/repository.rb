@@ -14,5 +14,9 @@ module Towhee::Blog
     def site_posts(site)
       @posts.dup
     end
+
+    def post_site(post)
+      @sites.first
+    end
   end
 end
