@@ -6,7 +6,7 @@ RSpec.describe Towhee::Blog::HomeView do
   let(:site) { Towhee::Blog::Site.new(name: "Some Site") }
 
   context "with no posts" do
-    let(:view) { described_class.new(site) }
+    let(:view) { described_class.new(site: site) }
 
     it "has root path" do
       expect(view.path).to eq "index.html"
@@ -31,7 +31,7 @@ RSpec.describe Towhee::Blog::HomeView do
 
   context "with a post" do
     let(:posts) { [Towhee::Blog::Post.new(title: "Some Post", slug: "aslug" )] }
-    let(:view) { described_class.new(site, posts: posts) }
+    let(:view) { described_class.new(site: site, posts: posts) }
 
     it "renders posts" do
       expect(view.render).to match /Some Post/

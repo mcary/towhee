@@ -12,7 +12,7 @@ module Towhee::Blog
       # not the other way around.
       case model
       when Site
-        [HomeView.new(model, posts: @repo.site_posts(model))]
+        [HomeView.new(site: model, posts: @repo.site_posts(model))]
       when Post
         [PostView.new(post: model, site: @repo.post_site(model))]
       else
