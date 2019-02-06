@@ -2,9 +2,10 @@ require 'towhee'
 
 module Towhee::Blog
   class Repository
-    def initialize(sites:, posts:)
-      @sites = sites.dup
-      @posts = posts.dup
+    def initialize(site_hash:)
+      @hash = site_hash.dup
+      @sites = site_hash.keys
+      @posts = site_hash.values.flat_map {|posts| posts}
     end
 
     def all_sites
@@ -16,7 +17,8 @@ module Towhee::Blog
     end
 
     def post_site(post)
-      @sites.first
+      site, posts = @hash.find {|k, v| v.include? post }
+      site
     end
   end
 end

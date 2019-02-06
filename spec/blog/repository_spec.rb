@@ -4,14 +4,16 @@ require 'towhee/blog/site'
 RSpec.describe Towhee::Blog::Repository do
   context "no sites" do
     it "returns none" do
-      repo = repository(sites: [])
+      repo = repository(site_hash: {})
       expect(repo.all_sites).to eq []
     end
   end
 
   context "one site" do
     it "returns one" do
-      repo = repository(sites: [Towhee::Blog::Site.new(name: "TestSite")])
+      repo = repository(site_hash: {
+        Towhee::Blog::Site.new(name: "TestSite") => [],
+      })
       expect(repo.all_sites.size).to eq 1
       expect(repo.all_sites.first.name).to eq "TestSite"
     end
@@ -20,17 +22,22 @@ RSpec.describe Towhee::Blog::Repository do
   context "one post" do
     it "returns one" do
       # Posts aren't linked to sites just yet; maybe someday.
-      repo = repository(sites: [], posts: [:a_post])
+      repo = repository(site_hash: { nil => [:a_post] })
       expect(repo.site_posts(nil).size).to eq 1
     end
 
     it "returns post's site" do
-      repo = repository(sites: [:a_site], posts: [:a_post])
-      expect(repo.post_site(nil)).to eq :a_site
+      repo = repository(site_hash: { :a_site => [:a_post] })
+      expect(repo.post_site(:a_post)).to eq :a_site
+    end
+
+    it "returns post's correct site" do
+      repo = repository(site_hash: { :other_site => [], :a_site => [:a_post] })
+      expect(repo.post_site(:a_post)).to eq :a_site
     end
   end
 
   def repository(**args)
-    described_class.new(posts: [], **args)
+    described_class.new(**args)
   end
 end

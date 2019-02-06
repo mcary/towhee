@@ -6,14 +6,15 @@ require 'towhee/blog/repository'
 
 RSpec.describe "Blog prerendering" do
   subject do
-    repo = Towhee::Blog::Repository.new(
-      sites: [Towhee::Blog::Site.new(name: "Foo")],
-      posts: [Towhee::Blog::Post.new(
-        title: "Title",
-        slug: "slug",
-        body: "<p>Body",
-      )],
-    )
+    repo = Towhee::Blog::Repository.new(site_hash: {
+      Towhee::Blog::Site.new(name: "Foo") => [
+        Towhee::Blog::Post.new(
+          title: "Title",
+          slug: "slug",
+          body: "<p>Body",
+        ),
+      ],
+    })
     Towhee::Blog::App.new(fs: file_system, repo: repo)
   end
 
