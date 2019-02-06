@@ -17,5 +17,11 @@ RSpec.describe Towhee::Prerender::FileSystem do
     subject["foo.html"] = "bar\n"
     expect(File.read(fs_root + "/foo.html")).to eq "bar\n"
   end
-end
 
+  it "creates subdirectories" do
+    FileUtils.rm_rf(fs_root)
+    Dir.mkdir(fs_root)
+    subject["subdir/foo.html"] = "bar\n"
+    expect(File.read(fs_root + "/subdir/foo.html")).to eq "bar\n"
+  end
+end
