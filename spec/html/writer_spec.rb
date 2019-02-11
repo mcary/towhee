@@ -61,6 +61,13 @@ RSpec.describe Towhee::HTML::Writer do
     ".gsub("\n" + " "*6, "\n").strip + "\n"
   end
 
+  it "writes section and aside" do
+    result = subject.aside { "hi" }
+    expect(result.to_s).to eq "<aside>\n  hi\n</aside>\n"
+    result = subject.section { "hi" }
+    expect(result.to_s).to eq "<section>\n  hi\n</section>\n"
+  end
+
   it "writes title" do
     result = subject.title { "Site » Page" }
     expect(result.to_s).to eq "<title>Site » Page</title>\n"
