@@ -19,9 +19,7 @@ module Towhee::Blog
           @html.title { @post.title + " - " + @site.name }
         end +
           @html.body do
-            @html.h1 { @post.title } +
-              @html.trust("\n" + @post.body) +
-              sidebar
+            post + sidebar
           end
       end.to_s
     end
@@ -31,6 +29,11 @@ module Towhee::Blog
     end
 
     private
+
+    def post
+      @html.h1 { @post.title } +
+        @html.trust("\n" + @post.body)
+    end
 
     def sidebar
       @html.aside do
