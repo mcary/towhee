@@ -29,4 +29,8 @@ RSpec.describe Towhee::Blog::PostView do
     expect(view.render).to match %r{<p>Post body.</p>}
     expect(view.render).to match %r{<p>More post body.</p>}
   end
+
+  it "renders a sidebar" do
+    expect(view.render).to match %r{<h1>\s*Recent Posts\s*</h1>}
+  end
 end

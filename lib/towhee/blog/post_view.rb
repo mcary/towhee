@@ -20,7 +20,8 @@ module Towhee::Blog
         end +
           @html.body do
             @html.h1 { @post.title } +
-              @html.trust("\n" + @post.body)
+              @html.trust("\n" + @post.body) +
+              sidebar
           end
       end.to_s
     end
@@ -30,5 +31,13 @@ module Towhee::Blog
     end
 
     private
+
+    def sidebar
+      @html.aside do
+        @html.section do
+          @html.h1 { "Recent Posts" }
+        end
+      end
+    end
   end
 end
