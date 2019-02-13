@@ -20,5 +20,9 @@ module Towhee::Blog
       site, posts = @hash.find {|k, v| v.include? post }
       site
     end
+
+    def recent_posts(site)
+      @posts.reverse.take(3)
+    end
   end
 end

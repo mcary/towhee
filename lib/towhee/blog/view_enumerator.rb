@@ -14,7 +14,11 @@ module Towhee::Blog
       when Site
         [HomeView.new(site: model, posts: @repo.site_posts(model))]
       when Post
-        [PostView.new(post: model, site: @repo.post_site(model))]
+        [PostView.new(
+          post: model,
+          site: site=@repo.post_site(model),
+          recent: @repo.recent_posts(site),
+        )]
       else
         raise "Unknown model: #{model}"
       end

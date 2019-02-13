@@ -3,7 +3,7 @@ require 'towhee/html/writer'
 
 module Towhee::Blog
   class PostView
-    def initialize(site:, post:, recent: [])
+    def initialize(site:, post:, recent:)
       @site = site
       @post = post
       @recent = recent

@@ -35,6 +35,11 @@ RSpec.describe Towhee::Blog::Repository do
       repo = repository(site_hash: { :other_site => [], :a_site => [:a_post] })
       expect(repo.post_site(:a_post)).to eq :a_site
     end
+
+    it "returns recent posts" do
+      repo = repository(site_hash: { :a_site => (1..5).to_a })
+      expect(repo.recent_posts(:a_site)).to eq [5, 4, 3]
+    end
   end
 
   def repository(**args)
