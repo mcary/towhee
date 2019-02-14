@@ -6,7 +6,7 @@ RSpec.describe Towhee::Blog::HomeView do
   let(:site) { Towhee::Blog::Site.new(name: "Some Site") }
 
   context "with no posts" do
-    let(:view) { described_class.new(site: site) }
+    let(:view) { described_class.new(site: site, posts: []) }
 
     it "has root path" do
       expect(view.path).to eq "index.html"

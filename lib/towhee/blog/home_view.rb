@@ -3,7 +3,7 @@ require 'towhee/html/writer'
 
 module Towhee::Blog
   class HomeView
-    def initialize(site:, posts: [])
+    def initialize(site:, posts:)
       @site = site
       @posts = posts
       @html = Towhee::HTML::Writer.new
