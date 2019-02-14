@@ -20,6 +20,7 @@ module Towhee::Blog
         title: @post.title + " - " + @site.name,
         main: post,
         sidebar_modules: sidebar_modules,
+        site: @site,
       ).render
     end
 
