@@ -1,5 +1,6 @@
 require 'towhee/blog/home_view'
 require 'towhee/blog/post_view'
+require 'towhee/blog/layout'
 
 module Towhee::Blog
   class ViewEnumerator
@@ -18,6 +19,7 @@ module Towhee::Blog
           post: model,
           site: site=@repo.post_site(model),
           recent: @repo.recent_posts(site),
+          layout: Towhee::Blog::Layout,
         )]
       else
         raise "Unknown model: #{model}"

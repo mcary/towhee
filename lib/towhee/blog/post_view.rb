@@ -3,10 +3,11 @@ require 'towhee/html/writer'
 
 module Towhee::Blog
   class PostView
-    def initialize(site:, post:, recent:)
+    def initialize(site:, post:, recent:, layout:)
       @site = site
       @post = post
       @recent = recent
+      @layout = layout
       @html = Towhee::HTML::Writer.new
     end
 
@@ -15,14 +16,11 @@ module Towhee::Blog
     end
 
     def render
-      @html.html do
-        @html.head do
-          @html.title { @post.title + " - " + @site.name }
-        end +
-          @html.body do
-            post + sidebar
-          end
-      end.to_s
+      @layout.new(
+        title: @post.title + " - " + @site.name,
+        main: post,
+        sidebar_modules: sidebar_modules,
+      ).render
     end
 
     def key
@@ -36,13 +34,11 @@ module Towhee::Blog
         @html.trust("\n" + @post.body)
     end
 
-    def sidebar
-      @html.aside do
-        @html.section do
-          @html.h1 { "Recent Posts" } +
-            recent_post_content
-        end
-      end
+    def sidebar_modules
+      [
+        @html.h1 { "Recent Posts" } +
+          recent_post_content,
+      ]
     end
 
     def recent_post_content

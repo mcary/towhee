@@ -1,11 +1,17 @@
 require 'towhee/blog/post_view'
+require 'towhee/blog/layout'
 require 'towhee/blog/site'
 require 'towhee/blog/post'
 
 RSpec.describe Towhee::Blog::PostView do
   let(:site) { Towhee::Blog::Site.new(name: "Some Site") }
   let(:view) do
-    described_class.new(site: site, post: post, recent: recent_posts)
+    described_class.new(
+      site: site,
+      post: post,
+      recent: recent_posts,
+      layout: Towhee::Blog::Layout,
+    )
   end
   let(:post) do
     Towhee::Blog::Post.new(
