@@ -31,12 +31,17 @@ RSpec.describe Towhee::HTML::Writer do
     expect(result.to_s).to eq "<a href=\"/path\">text</a>"
   end
 
+  it "writes meta tags without closing and with newline" do
+    result = subject.meta(name: "description", content: "foo")
+    expect(result.to_s).to eq "<meta name=\"description\" content=\"foo\" />\n"
+  end
+
   it "writes line break tags with a newline" do
     result = subject.br
     expect(result.to_s).to eq "<br />\n"
   end
 
-  it "writes header tags" do
+  it "writes heading tags" do
     (1..6).each do |n|
       result = subject.public_send("h#{n}") { "hello" }
       expect(result.to_s).to eq "<h#{n}>\n  hello\n</h#{n}>\n"
@@ -66,6 +71,11 @@ RSpec.describe Towhee::HTML::Writer do
     expect(result.to_s).to eq "<aside>\n  hi\n</aside>\n"
     result = subject.section { "hi" }
     expect(result.to_s).to eq "<section>\n  hi\n</section>\n"
+  end
+
+  it "writes header tag" do
+    result = subject.header { "hello" }
+    expect(result.to_s).to eq "<header>\n  hello\n</header>\n"
   end
 
   it "writes title" do
