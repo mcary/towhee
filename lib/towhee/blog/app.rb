@@ -18,8 +18,12 @@ module Towhee::Blog
     def engine
       Towhee::Prerender::Engine.new(
         fs: @fs,
-        view_enumerator: ViewEnumerator.new(repo: @repo),
+        view_enumerator: view_enumerator,
       )
+    end
+
+    def view_enumerator
+      ViewEnumerator.new(repo: @repo)
     end
   end
 end

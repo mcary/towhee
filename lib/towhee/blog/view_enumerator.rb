@@ -16,18 +16,24 @@ module Towhee::Blog
         [HomeView.new(
           site: model,
           posts: @repo.site_posts(model),
-          layout: Towhee::Blog::Layout,
+          layout: layout,
         )]
       when Post
         [PostView.new(
           post: model,
           site: site=@repo.post_site(model),
           recent: @repo.recent_posts(site),
-          layout: Towhee::Blog::Layout,
+          layout: layout,
         )]
       else
         raise "Unknown model: #{model}"
       end
+    end
+
+    private
+
+    def layout
+      Towhee::Blog::Layout
     end
   end
 end
