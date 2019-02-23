@@ -9,8 +9,10 @@ module Towhee::Blog
     end
 
     def prerender
+      first_site = @repo.all_sites.first
       engine.batch_changed(@repo.all_sites +
-                           @repo.site_posts(@repo.all_sites.first))
+                           @repo.site_posts(first_site) +
+                           @repo.site_categories(first_site))
     end
 
     private

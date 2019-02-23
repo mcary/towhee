@@ -1,5 +1,6 @@
 require 'towhee/blog/home_view'
 require 'towhee/blog/post_view'
+require 'towhee/blog/category_view'
 require 'towhee/blog/layout'
 
 module Towhee::Blog
@@ -22,6 +23,14 @@ module Towhee::Blog
         [PostView.new(
           post: model,
           site: site=@repo.post_site(model),
+          recent: @repo.recent_posts(site),
+          layout: layout,
+        )]
+      when Category
+        [CategoryView.new(
+          category: model,
+          site: @repo.category_site(model),
+          posts: @repo.category_posts(model),
           recent: @repo.recent_posts(site),
           layout: layout,
         )]

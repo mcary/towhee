@@ -42,7 +42,35 @@ RSpec.describe Towhee::Blog::Repository do
     end
   end
 
+  context "one category" do
+    it "returns a category's posts" do
+      repo = repository(category_hash: { :a_cat => [:a_post] })
+      expect(repo.category_posts(:a_cat)).to eq [:a_post]
+    end
+
+    it "returns a post's correct category" do
+      repo = repository(category_hash: { :other => [], :a_cat => [:a_post] })
+      expect(repo.post_category(:a_post)).to eq :a_cat
+    end
+
+    it "returns a site's categories" do
+      repo = repository(
+        site_hash: { :a_site => [:a_post] },
+        category_hash: { :a_cat => [:a_post], :other_cat => [:other_post] },
+      )
+      expect(repo.site_categories(:a_site)).to eq [:a_cat]
+    end
+
+    it "returns a category's site" do
+      repo = repository(
+        site_hash: { :a_site => [:a_post], :other_site => [:other_post] },
+        category_hash: { :a_cat => [:a_post], :other_cat => [:other_post] },
+      )
+      expect(repo.category_site(:a_cat)).to eq :a_site
+    end
+  end
+
   def repository(**args)
-    described_class.new(**args)
+    described_class.new(site_hash: {}, category_hash: {}, **args)
   end
 end
