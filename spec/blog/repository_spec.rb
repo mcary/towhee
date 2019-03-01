@@ -47,8 +47,11 @@ RSpec.describe Towhee::Blog::Repository do
 
   context "one category" do
     it "returns a category's posts" do
-      repo = repository(category_hash: { :a_cat => [:a_post] })
-      expect(repo.category_posts(:a_cat)).to eq [:a_post]
+      repo = repository(
+        site_hash: { :a_site => [:a_post] },
+        category_hash: { :a_cat => [:a_post] },
+      )
+      expect(repo.category_posts(:a_cat, site: :a_site)).to eq [:a_post]
     end
 
     it "returns a post's correct category" do
@@ -78,6 +81,23 @@ RSpec.describe Towhee::Blog::Repository do
         category_hash: { :a_cat => [:a_post], :other_cat => [:other_post] },
       )
       expect(repo.category_site(:a_cat)).to eq :a_site
+    end
+
+    it "returns a category summary" do
+      repo = repository(
+        site_hash: {
+          :a_site => [:a_post, :b_post],
+          :other_site => [:other_post],
+        },
+        category_hash: {
+          :a_cat => [:a_post],
+          :all_cat => [:a_post, :b_post, :other_post],
+        },
+      )
+      expect(repo.category_summary(:a_site)).to eq(
+        a_cat: 1,
+        all_cat: 2,
+      )
     end
   end
 

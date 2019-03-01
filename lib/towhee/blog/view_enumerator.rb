@@ -24,6 +24,7 @@ module Towhee::Blog
           post: model,
           site: site=@repo.post_site(model),
           recent: @repo.recent_posts(site),
+          category_summary: @repo.category_summary(site),
           layout: layout,
         )]
       when Category
