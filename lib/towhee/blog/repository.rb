@@ -14,7 +14,7 @@ module Towhee::Blog
     end
 
     def site_posts(site)
-      @posts.dup
+      @site_hash[site].dup
     end
 
     def post_site(post)

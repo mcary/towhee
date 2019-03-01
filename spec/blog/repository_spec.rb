@@ -20,10 +20,13 @@ RSpec.describe Towhee::Blog::Repository do
   end
 
   context "one post" do
-    it "returns one" do
+    it "returns site's post" do
       # Posts aren't linked to sites just yet; maybe someday.
-      repo = repository(site_hash: { nil => [:a_post] })
-      expect(repo.site_posts(nil).size).to eq 1
+      repo = repository(site_hash: {
+        :a_site => [:a_post],
+        :other_site => [:other_post],
+      })
+      expect(repo.site_posts(:a_site)).to eq [:a_post]
     end
 
     it "returns post's site" do
