@@ -36,7 +36,7 @@ module Towhee::Blog
     end
 
     def site_categories(site)
-      site_posts(site).map { |post| post_category(post) }.compact
+      site_posts(site).map { |post| post_category(post) }.uniq.compact
     end
 
     def category_site(category)

@@ -61,6 +61,14 @@ RSpec.describe Towhee::Blog::Repository do
       expect(repo.site_categories(:a_site)).to eq [:a_cat]
     end
 
+    it "returns a site's distinct categories" do
+      repo = repository(
+        site_hash: { :a_site => [:a_post, :other_post] },
+        category_hash: { :a_cat => [:a_post, :other_post] },
+      )
+      expect(repo.site_categories(:a_site)).to eq [:a_cat]
+    end
+
     it "returns a category's site" do
       repo = repository(
         site_hash: { :a_site => [:a_post], :other_site => [:other_post] },
